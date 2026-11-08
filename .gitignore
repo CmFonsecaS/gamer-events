@@ -1,0 +1,8 @@
+# Secretos locales
+.env
+# Compilación
+**/target/
+# IDE
+.vscode/
+.idea/
+*.iml

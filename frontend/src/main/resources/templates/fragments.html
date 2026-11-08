@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' | Gamer Events'">Gamer Events</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/logo.svg}">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+</head>
+<body>
+
+<header th:fragment="cabecera" class="cabecera">
+    <div class="contenedor cabecera__fila">
+        <a th:href="@{/eventos}" class="logo" aria-label="Gamer Events, ir al inicio">
+            <img th:src="@{/img/logo.svg}" alt="" width="36" height="36">
+            <span>GAMER<strong>EVENTS</strong></span>
+        </a>
+        <nav class="nav" aria-label="Principal">
+            <a th:href="@{/eventos}">Inicio</a>
+            <a th:href="@{/eventos/buscar}">Buscar eventos</a>
+            <a sec:authorize="isAnonymous()" th:href="@{/login}" class="boton boton--borde">Iniciar sesión</a>
+            <div sec:authorize="isAuthenticated()" class="nav__usuario">
+                <span class="nav__saludo">Hola, <strong sec:authentication="principal.nombre">Jugador</strong></span>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="boton boton--borde">Cerrar sesión</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<article th:fragment="tarjeta(e)" class="tarjeta" th:with="img=${@urlSegura.imagen(e.imagenPortada)}">
+    <a th:href="@{/eventos/{id}(id=${e.id})}" class="tarjeta__enlace">
+        <div class="tarjeta__imagen">
+            <img th:src="@{${img}}" th:alt="${e.nombre}" loading="lazy">
+            <span class="chip" th:classappend="${e.modalidad == 'ONLINE'} ? 'chip--online' : 'chip--presencial'"
+                  th:text="${e.modalidad == 'ONLINE'} ? 'Online' : 'Presencial'">Presencial</span>
+        </div>
+        <div class="tarjeta__cuerpo">
+            <p class="tarjeta__juego" th:text="${e.videojuego} + ' · ' + ${e.categoria}">Juego · Categoría</p>
+            <h3 class="tarjeta__titulo" th:text="${e.nombre}">Nombre del evento</h3>
+            <p class="tarjeta__resumen" th:text="${e.resumen}">Resumen</p>
+            <ul class="tarjeta__datos">
+                <li><span class="icono" aria-hidden="true">📅</span>
+                    <span th:text="${#temporals.format(e.fechaInicio, 'EEE d MMM yyyy · HH:mm')}">fecha</span></li>
+                <li><span class="icono" aria-hidden="true">📍</span>
+                    <span th:text="${e.ciudad} + ', ' + ${e.pais}">Ciudad, País</span></li>
+                <li><span class="icono" aria-hidden="true">👥</span>
+                    <span th:text="${e.inscritos} + ' / ' + ${e.cupos} + ' inscritos'">0 / 0</span></li>
+            </ul>
+            <div class="tarjeta__pie">
+                <span class="precio" th:text="${e.precio == 0} ? 'Gratis' : '$' + ${#numbers.formatInteger(e.precio, 1, 'POINT')}">Gratis</span>
+                <span class="tarjeta__ver" sec:authorize="isAuthenticated()">Ver detalle →</span>
+                <span class="tarjeta__ver" sec:authorize="isAnonymous()">🔒 Inicia sesión para ver detalle</span>
+            </div>
+        </div>
+    </a>
+</article>
+
+<footer th:fragment="pie" class="pie">
+    <div class="contenedor">
+        <p><strong>Gamer Events</strong> · Proyecto académico ISY2202 Seguridad y Calidad en el Desarrollo de Software · Duoc UC</p>
+        <p class="pie__nota">Eventos y marcas ficticios con fines de demostración.</p>
+    </div>
+</footer>
+
+</body>
+</html>

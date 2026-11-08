@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Error')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecera}"></header>
+
+<main class="contenedor error-pagina">
+    <p class="error-pagina__codigo" th:text="${status}">404</p>
+    <h1 th:switch="${status}">
+        <span th:case="404">No encontramos esa página</span>
+        <span th:case="403">No tienes permiso para ver esta página</span>
+        <span th:case="400">Solicitud no válida</span>
+        <span th:case="503">Servicio no disponible</span>
+        <span th:case="*">Ocurrió un error</span>
+    </h1>
+    <!-- Solo mensajes propios; nunca se muestran detalles técnicos. -->
+    <p class="subtitulo" th:text="${mensaje != null} ? ${mensaje} : 'Vuelve al inicio o intenta nuevamente más tarde.'">Mensaje</p>
+    <a th:href="@{/eventos}" class="boton boton--primario">Ir al inicio</a>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Buscar eventos')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecera}"></header>
+
+<main class="contenedor seccion">
+    <h1>Buscar eventos</h1>
+    <p class="subtitulo">Combina los filtros que quieras. Todos son opcionales.</p>
+
+    <form th:action="@{/eventos/buscar}" th:object="${busqueda}" method="get" class="filtros" novalidate>
+        <div class="campo campo--ancho">
+            <label for="nombre">Nombre del evento</label>
+            <input type="search" id="nombre" th:field="*{nombre}" maxlength="80" placeholder="Ej: Copa, LAN, Fest...">
+        </div>
+        <div class="campo">
+            <label for="videojuego">Videojuego</label>
+            <select id="videojuego" th:field="*{videojuego}">
+                <option value="">Todos</option>
+                <option th:each="v : ${filtros.videojuegos}" th:value="${v.id}" th:text="${v.nombre}">Juego</option>
+            </select>
+        </div>
+        <div class="campo">
+            <label for="categoria">Tipo / categoría</label>
+            <select id="categoria" th:field="*{categoria}">
+                <option value="">Todas</option>
+                <option th:each="c : ${filtros.categorias}" th:value="${c.id}" th:text="${c.nombre}">Categoría</option>
+            </select>
+        </div>
+        <div class="campo">
+            <label for="ubicacion">País o ciudad</label>
+            <input type="text" id="ubicacion" th:field="*{ubicacion}" maxlength="60" list="lista-ubicaciones" placeholder="Ej: Chile, Lima">
+            <datalist id="lista-ubicaciones">
+                <option th:each="p : ${filtros.paises}" th:value="${p}"></option>
+                <option th:each="c : ${filtros.ciudades}" th:value="${c}"></option>
+            </datalist>
+        </div>
+        <div class="campo">
+            <label for="modalidad">Modalidad</label>
+            <select id="modalidad" th:field="*{modalidad}">
+                <option value="">Todas</option>
+                <option value="PRESENCIAL">Presencial</option>
+                <option value="ONLINE">Online</option>
+            </select>
+        </div>
+        <div class="campo">
+            <label for="desde">Desde</label>
+            <input type="date" id="desde" th:field="*{desde}">
+        </div>
+        <div class="campo">
+            <label for="hasta">Hasta</label>
+            <input type="date" id="hasta" th:field="*{hasta}">
+        </div>
+        <div class="filtros__acciones">
+            <button type="submit" class="boton boton--primario">🔍 Buscar</button>
+            <a th:href="@{/eventos/buscar}" class="boton boton--borde">Limpiar</a>
+        </div>
+
+        <div th:if="${#fields.hasAnyErrors()}" class="aviso aviso--error campo--completo" role="alert">
+            <p>Revisa los filtros:</p>
+            <ul>
+                <li th:each="err : ${#fields.allErrors()}" th:text="${err}">Error</li>
+            </ul>
+        </div>
+    </form>
+
+    <p class="contador" th:unless="${invalido}"
+       th:text="${#lists.size(resultados)} == 1 ? '1 evento encontrado' : ${#lists.size(resultados)} + ' eventos encontrados'">0 eventos</p>
+
+    <div class="grilla">
+        <th:block th:each="e : ${resultados}"><article th:replace="~{fragments :: tarjeta(${e})}"></article></th:block>
+    </div>
+    <p th:if="${#lists.isEmpty(resultados) and !invalido}" class="vacio">
+        No encontramos eventos con esos filtros. Prueba con menos filtros o con otras fechas.
+    </p>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments :: head('Inicio')}"></head>
+<body>
+<header th:replace="~{fragments :: cabecera}"></header>
+
+<main>
+    <section class="hero">
+        <div class="contenedor hero__contenido">
+            <p class="hero__etiqueta">Torneos · LAN Parties · Convenciones · Meetups</p>
+            <h1>Todos los <span class="neon">eventos gamer</span> en un solo lugar</h1>
+            <p class="hero__texto">Encuentra competencias presenciales y online por videojuego, ciudad, fecha y modalidad.</p>
+            <div class="hero__acciones">
+                <a th:href="@{/eventos/buscar}" class="boton boton--primario">Buscar eventos</a>
+                <a sec:authorize="isAnonymous()" th:href="@{/login}" class="boton boton--borde">Iniciar sesión</a>
+            </div>
+            <p th:if="${param.salir != null}" class="aviso aviso--ok" role="status">Cerraste sesión correctamente.</p>
+        </div>
+    </section>
+
+    <section class="contenedor seccion" aria-labelledby="t-banners">
+        <h2 id="t-banners" class="oculto">Avisos comerciales</h2>
+        <div class="banners">
+            <figure class="banner" th:each="b : ${inicio.banners}" th:with="img=${@urlSegura.imagen(b.imagen)}">
+                <img th:src="@{${img}}" th:alt="${b.titulo}">
+                <figcaption>
+                    <span class="banner__tag">Publicidad</span>
+                    <strong th:text="${b.titulo}">Título</strong>
+                    <span th:text="${b.texto}">Texto</span>
+                </figcaption>
+            </figure>
+        </div>
+    </section>
+
+    <section class="contenedor seccion" aria-labelledby="t-recientes">
+        <div class="seccion__cabecera">
+            <h2 id="t-recientes">🆕 Eventos más recientes</h2>
+            <a th:href="@{/eventos/buscar}" class="enlace">Ver todos →</a>
+        </div>
+        <div class="grilla">
+            <th:block th:each="e : ${inicio.recientes}"><article th:replace="~{fragments :: tarjeta(${e})}"></article></th:block>
+        </div>
+        <p th:if="${#lists.isEmpty(inicio.recientes)}" class="vacio">Aún no hay eventos publicados.</p>
+    </section>
+
+    <section class="contenedor seccion" aria-labelledby="t-populares">
+        <div class="seccion__cabecera">
+            <h2 id="t-populares">🔥 Eventos más populares</h2>
+        </div>
+        <div class="grilla">
+            <th:block th:each="e : ${inicio.populares}"><article th:replace="~{fragments :: tarjeta(${e})}"></article></th:block>
+        </div>
+    </section>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+</body>
+</html>

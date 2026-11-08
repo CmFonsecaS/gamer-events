@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${evento.nombre})}"></head>
+<body>
+<header th:replace="~{fragments :: cabecera}"></header>
+
+<main th:with="e=${evento}">
+    <section class="detalle-hero" th:with="portada=${@urlSegura.imagen(e.imagenPortada)}">
+        <img th:src="@{${portada}}" alt="" class="detalle-hero__fondo">
+        <div class="contenedor detalle-hero__contenido">
+            <a th:href="@{/eventos/buscar}" class="enlace">← Volver a la búsqueda</a>
+            <div class="chips">
+                <span class="chip" th:classappend="${e.modalidad == 'ONLINE'} ? 'chip--online' : 'chip--presencial'"
+                      th:text="${e.modalidad == 'ONLINE'} ? 'Online' : 'Presencial'">Presencial</span>
+                <span class="chip" th:text="${e.categoria}">Categoría</span>
+            </div>
+            <h1 th:text="${e.nombre}">Nombre</h1>
+            <p class="detalle-hero__resumen" th:text="${e.resumen}">Resumen</p>
+        </div>
+    </section>
+
+    <div class="contenedor detalle">
+        <div class="detalle__principal">
+            <section class="panel">
+                <h2>Descripción</h2>
+                <p class="texto-largo" th:text="${e.descripcion}">Descripción</p>
+            </section>
+
+            <section class="panel">
+                <h2>Requisitos de participación</h2>
+                <p class="texto-largo" th:text="${e.requisitos}">Requisitos</p>
+            </section>
+
+            <section class="panel">
+                <h2>Inscripción</h2>
+                <p class="texto-largo" th:text="${e.infoInscripcion}">Información de inscripción</p>
+            </section>
+
+            <section class="panel" th:unless="${#lists.isEmpty(e.fotos)}">
+                <h2>Fotografías</h2>
+                <div class="galeria">
+                    <figure th:each="f : ${e.fotos}" th:with="foto=${@urlSegura.imagen(f.url)}">
+                        <img th:src="@{${foto}}" th:alt="${f.descripcion}" loading="lazy">
+                        <figcaption th:text="${f.descripcion}">Descripción</figcaption>
+                    </figure>
+                </div>
+            </section>
+        </div>
+
+        <aside class="detalle__lateral">
+            <section class="panel ficha">
+                <h2>Datos del evento</h2>
+                <dl>
+                    <dt>Videojuego</dt>
+                    <dd><span th:text="${e.videojuego}">Juego</span>
+                        <small th:if="${e.generoVideojuego}" th:text="'(' + ${e.generoVideojuego} + ')'">(género)</small></dd>
+
+                    <dt>Inicio</dt>
+                    <dd th:text="${#temporals.format(e.fechaInicio, 'EEEE d ''de'' MMMM yyyy, HH:mm ''hrs''')}">fecha</dd>
+
+                    <dt th:if="${e.fechaFin}">Término</dt>
+                    <dd th:if="${e.fechaFin}" th:text="${#temporals.format(e.fechaFin, 'EEEE d ''de'' MMMM yyyy, HH:mm ''hrs''')}">fecha</dd>
+
+                    <dt>Ciudad</dt>
+                    <dd th:text="${e.ciudad} + ', ' + ${e.pais}">Ciudad</dd>
+
+                    <dt th:if="${e.direccion}">Dirección</dt>
+                    <dd th:if="${e.direccion}" th:text="${e.direccion}">Dirección</dd>
+
+                    <th:block th:with="enlace=${@urlSegura.externa(e.enlaceAcceso)}">
+                        <dt th:if="${enlace}">Enlace de acceso</dt>
+                        <dd th:if="${enlace}"><a th:href="${enlace}" th:text="${enlace}" target="_blank" rel="noopener noreferrer">enlace</a></dd>
+                    </th:block>
+
+                    <dt>Valor</dt>
+                    <dd class="precio" th:text="${e.precio == 0} ? 'Gratis' : '$' + ${#numbers.formatInteger(e.precio, 1, 'POINT')}">Gratis</dd>
+
+                    <dt>Cupos</dt>
+                    <dd>
+                        <meter min="0" th:max="${e.cupos}" th:value="${e.inscritos}" th:high="${e.cupos * 0.85}"></meter>
+                        <span th:text="${e.inscritos} + ' de ' + ${e.cupos} + ' inscritos'">0 de 0</span>
+                    </dd>
+                </dl>
+            </section>
+
+            <section class="panel ficha" th:if="${e.organizador}" th:with="o=${e.organizador}">
+                <h2>Organizador</h2>
+                <dl>
+                    <dt>Nombre</dt>
+                    <dd th:text="${o.nombre}">Organizador</dd>
+                    <dt th:if="${o.email}">Contacto</dt>
+                    <dd th:if="${o.email}"><a th:href="'mailto:' + ${o.email}" th:text="${o.email}">correo</a></dd>
+                    <th:block th:with="sitio=${@urlSegura.externa(o.sitioWeb)}">
+                        <dt th:if="${sitio}">Sitio web</dt>
+                        <dd th:if="${sitio}"><a th:href="${sitio}" th:text="${sitio}" target="_blank" rel="noopener noreferrer">sitio</a></dd>
+                    </th:block>
+                </dl>
+            </section>
+        </aside>
+    </div>
+</main>
+
+<footer th:replace="~{fragments :: pie}"></footer>
+</body>
+</html>
